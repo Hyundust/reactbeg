@@ -1,47 +1,35 @@
 import AppHeader from "../appHeader/AppHeader";
-import RandomChar from "../randomChar/RandomChar";
-import CharList from "../charList/CharList";
-import CharInfo from "../charInfo/CharInfo";
-import decoration from '../../resources/img/vision.png';
-import { Component } from "react";
-import ErrorBoundary from "../errorBoundary/boundary";
+import { lazy,Suspense } from "react";
+import { BrowserRouter as Router,Route,Routes } from "react-router-dom";
+import Spinner from "../Loading/spinner";
 
-class App extends Component{
-    state = {
-        selectedChar:null
+const Page404 = lazy(()=>import("../pages/404"));
+const MainPage = lazy(()=>import("../pages/MainPage"));
+const Comics = lazy(()=>import("../pages/Comics"));
+const SingleComicPage = lazy(()=>import("../pages/singleComic"))
 
-    }
-    onCharSelected=(id)=>{
-        this.setState({
 
-            selectedChar: id
-        })
-
-    }
-
-    render(){
+const App =()=>{
+    
     return (
-        <div className="app">
-            <AppHeader/>
-            <main>
-                <ErrorBoundary>
-                        <RandomChar/>
-                </ErrorBoundary>
+        <Router>
+            <div className="app">
+                <AppHeader/>
+                <main>
+                    <Suspense fallback = {<Spinner/>}>
+                        <Routes>
+                            <Route path = "/" element = {<MainPage/>}/>
+                            <Route path = 'comics' element ={<Comics/>}/>   
+                            <Route path = 'comics/:comicId' element ={<SingleComicPage/>}/>  
+                            <Route path = '*' element = {<Page404/>}/>
+                        </Routes>
+                    </Suspense>
                 
-                <div className="char__content">
-                    <ErrorBoundary>
-                            <CharList onCharSelected={this.onCharSelected}/>
-                    </ErrorBoundary>
-
-                    <ErrorBoundary>
-                            <CharInfo charId = {this.state.selectedChar}/>
-                    </ErrorBoundary>
-                    
-                </div>
-                <img className="bg-decoration" src={decoration} alt="vision"/>
-            </main>
-        </div>
+                
+                </main>
+            </div>
+        </Router>
     )
 }
-}
+
 export default App;
